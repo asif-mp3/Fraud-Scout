@@ -145,5 +145,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ---
 
 <p align="center">
-  For more information, please contact the project maintainers or visit our website at <a href="https://www.fraudscout.com">www.fraudscout.com</a>.
+  For more information, please contact Mohamed Asif at <a href="mailto:asifoned@gmail.com">asifoned@gmail.com</a>.
 </p>
