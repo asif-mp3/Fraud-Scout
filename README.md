@@ -56,7 +56,7 @@ fraudscout/
 │   ├── public/
 │   ├── styles/
 │   ├── lib/
-│   └── context/
+│   └── app/
 └── backend/
     ├── app.py
     └── model.pkl
@@ -68,7 +68,7 @@ fraudscout/
 
 1. Clone the repository:
    ```
-   git clone https://github.com/your-username/fraudscout.git
+   git clone https://github.com/asif-mp3/financial-fraud-detection.git
    ```
 
 2. Navigate to the frontend directory and install dependencies:
@@ -120,13 +120,19 @@ fraudscout/
 Here are some screenshots of the FraudScout implementation:
 
 <p align="center">
-  <img src="fs-1.png" alt="Dashboard Overview" width="45%">
-  <img src="fs-2.png" alt="Transaction Analysis" width="45%">
+  <img src="fs-6.png" alt="Dashboard Overview" width="45%">
+  <img src="fs-1.png" alt="Transaction Analysis" width="45%">
 </p>
 <p align="center">
-  <img src="fs-3.png" alt="Risk Assessment" width="45%">
-  <img src="fs-4.png" alt="Anomaly Detection" width="45%">
+  <img src="fs-2.png" alt="Risk Assessment" width="45%">
+  <img src="fs-3.png" alt="Anomaly Detection" width="45%">
 </p>
+<p align="center">
+  <img src="fs-4.png" alt="Risk Assessment" width="45%">
+  <img src="fs-5.png" alt="Anomaly Detection" width="45%">
+</p>
+
+  
 
 ## 🤝 Contributing
 
