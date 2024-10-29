@@ -1,9 +1,8 @@
 # 🕵️‍♂️ Anomaly Detection in Financial Transactions
 
 <p align="center">
-  <img src="https://example.com/fraudscout-logo.png" alt="FraudScout Logo" width="200">
+  <img src="Fraudscout_logo.png">
 </p>
-
 <p align="center">
   <a href="#project-overview">Overview</a> •
   <a href="#key-features">Features</a> •
