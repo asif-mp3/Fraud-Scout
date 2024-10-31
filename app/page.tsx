@@ -4,12 +4,14 @@ import { useState, useEffect } from "react"
 import { useRouter } from 'next/navigation'
 import { Shield, Upload, BarChart, Search, Bell, Settings } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ThemeProvider } from '@/components/layout/ThemeContext'  // Updated import
+import { ThemeProvider } from '@/components/layout/ThemeContext'
 import Navbar from "@/components/layout/navbar"
 import Footer from '@/components/layout/footer'
 import Hero from '@/components/layout/hero'
 import Dashboard from '@/components/layout/dashboard'
 import KeyFeatures from '@/components/layout/keyfeat'
+import FAQ from '@/components/layout/faq'
+import { Progress } from "@/components/ui/progress"
 
 export default function FraudScoutDashboard() {
   const [image, setImage] = useState<File | null>(null)
@@ -17,23 +19,21 @@ export default function FraudScoutDashboard() {
   const [response, setResponse] = useState([])
   const [showData, setShowData] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [scrollProgress, setScrollProgress] = useState(0)
 
   const router = useRouter()
 
   // Smooth scrolling effect
   useEffect(() => {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault()
-        const target = document.querySelector(this.getAttribute('href'))
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          })
-        }
-      })
-    })
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight
+      const scrollPosition = window.scrollY
+      const progress = (scrollPosition / totalHeight) * 100
+      setScrollProgress(progress)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   function handleImage(e: React.ChangeEvent<HTMLInputElement>) {
@@ -65,7 +65,6 @@ export default function FraudScoutDashboard() {
     } catch (error) {
       console.error("Error fetching data:", error)
       setShowData(false)
-      // Show error message to user
       alert("An error occurred while processing your request. Please try again.")
     } finally {
       setIsLoading(false)
@@ -84,20 +83,46 @@ export default function FraudScoutDashboard() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <div className="flex flex-col min-h-screen">
-        <Navbar />
         <main className="flex-grow">
-          <Hero />
-          <Dashboard 
-            dashboardData={dashboardData} 
-            onSubmit={onSubmit} 
-            handleImage={handleImage}
-            isLoading={isLoading}
-            image={image}
-            uploadProgress={uploadProgress}
-            showData={showData}
-            response={response}
-          />
-          <KeyFeatures />
+          <Navbar />
+          <section id="hero" className="scroll-mt-16">
+          <Progress 
+          value={scrollProgress} 
+          className="fixed top-0 left-0 right-0 z-50 h-1 w-full bg-secondary"
+          indicatorClassName="bg-primary"
+        />
+            <Hero />
+          </section>
+          <div className="w-full flex justify-center my-8">
+            <div className="w-16 h-1 bg-primary rounded-full"></div>
+          </div>
+          
+          <section id="dashboard" className="scroll-mt-16">
+            <Dashboard 
+              dashboardData={dashboardData} 
+              onSubmit={onSubmit} 
+              handleImage={handleImage} 
+              isLoading={isLoading} 
+              image={image} 
+              uploadProgress={uploadProgress} 
+              showData={showData} 
+              response={response} 
+            />
+          </section>
+          <div className="w-full flex justify-center my-8">
+            <div className="w-16 h-1 bg-primary rounded-full"></div>
+          </div>
+          
+          <section id="features" className="scroll-mt-16">
+            <KeyFeatures />
+          </section>
+          <div className="w-full flex justify-center my-8">
+            <div className="w-16 h-1 bg-primary rounded-full"></div>
+          </div>
+          
+          <section id="faq" className="scroll-mt-16">
+            <FAQ />
+          </section>
         </main>
         <Footer />
       </div>
@@ -118,6 +143,5 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode, titl
         <CardDescription>{description}</CardDescription>
       </CardContent>
     </Card>
-    
   )
 }

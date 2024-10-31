@@ -14,6 +14,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { useInView } from 'react-intersection-observer'
+import { useTheme, useThemeStyles } from '@/components/layout/ThemeContext'
 
 interface Feature {
   icon: React.ReactNode
@@ -25,39 +26,39 @@ interface Feature {
 const features: Feature[] = [
   {
     icon: <Shield className="h-8 w-8" />,
-    title: "Advanced Detection",
-    description: "Utilize machine learning algorithms for accurate fraud detection",
-    details: "Our advanced detection system uses state-of-the-art machine learning models to analyze transaction patterns and identify potential fraud with high accuracy. It continuously learns from new data to improve its detection capabilities."
+    title: "Intelligent Fraud Detection",
+    description: "Utilize AI-driven models to identify fraud with accuracy, minimizing false positives.",
+    details: "Leverage advanced machine learning algorithms to identify potential fraud with precision, helping to significantly reduce false positives. FraudScout's intelligent detection model, powered by Random Forest, continually analyzes transaction data to adapt to new fraud patterns, ensuring accuracy and adaptability as fraud tactics evolve" 
+  },
+  {
+    icon: <Upload className="h-8 w-8" />,
+    title: "Live Transaction Monitoring",
+    description: "Track and analyze transactions in real-time to prevent fraudulent activities instantly",
+    details: "FraudScout monitors transactions as they occur, using real-time data streaming and analysis to detect anomalies instantly. This continuous tracking empowers businesses to address suspicious activities the moment they happen, enhancing both prevention and response capabilities in high-risk financial environments"
   },
   {
     icon: <BarChart className="h-8 w-8" />,
-    title: "Real-time Analytics",
-    description: "Monitor transactions and get insights in real-time",
-    details: "With our real-time analytics, you can view transaction data as it happens. Our dashboard provides instant visualizations and alerts, allowing you to spot trends and anomalies quickly."
+    title: "Dynamic Anomaly Recognition",
+    description: "Detect unusual patterns and adapt to evolving fraud tactics with machine learning.",
+    details: "With its AI-powered anomaly detection system, FraudScout recognizes subtle and complex fraud patterns across data, adapting to changing tactics. The tool's dynamic recognition feature can learn from past data, allowing it to flag new types of fraudulent behavior, protecting against sophisticated fraud schemes effectively."
   },
   {
     icon: <Search className="h-8 w-8" />,
-    title: "Pattern Recognition",
-    description: "Identify complex fraud patterns across your data",
+    title: "Immediate Risk Notifications",
+    description: "Receive prompt alerts on suspicious transactions, empowering fast response times.",
     details: "Our pattern recognition algorithms can detect subtle and complex fraud patterns that might be missed by traditional rule-based systems. It analyzes historical data to identify new and emerging fraud tactics."
   },
   {
     icon: <Bell className="h-8 w-8" />,
-    title: "Instant Alerts",
-    description: "Receive immediate notifications on suspicious activities",
-    details: "Set up customizable alerts to notify you instantly when suspicious activities are detected. Alerts can be sent via email, SMS, or push notifications to ensure you're always informed."
+    title: "Customizable Fraud Parameters",
+    description: "Set rules and adjust detection thresholds to align with specific risk profiles",
+    details: "Fine-tune FraudScout's detection settings to align with specific business needs, allowing for custom fraud rules, threshold adjustments, and tailored detection parameters. This flexibility ensures that the system can adapt to unique industry requirements and risk profiles, maximizing detection accuracy for each use case"
   },
   {
     icon: <Settings className="h-8 w-8" />,
-    title: "Customizable Rules",
+    title: "Scalable System Integration",
     description: "Set up and fine-tune detection rules to fit your needs",
-    details: "Our flexible rule engine allows you to create and modify fraud detection rules based on your specific business needs. You can easily adjust thresholds and parameters to optimize detection accuracy."
-  },
-  {
-    icon: <Upload className="h-8 w-8" />,
-    title: "Easy Integration",
-    description: "Seamlessly integrate with your existing systems",
-    details: "Our system is designed to integrate easily with your existing infrastructure. We provide APIs and SDKs for major programming languages, making it simple to incorporate our fraud detection capabilities into your workflow."
+    details: "Integrate FraudScout seamlessly into your existing financial systems, regardless of size or infrastructure. With support for flexible APIs and robust scalability, FraudScout can grow alongside your business, making it ideal for companies looking to enhance fraud management within larger, dynamic systems"
   },
 ]
 
@@ -76,9 +77,11 @@ const floatingIcons = [
   { Icon: Key, size: 48, top: '50%', left: '8%', rotation: '-10deg' },
 ]
 
-export default function KeyFeatures() {
+export default function Component() {
   const controls = useAnimation()
   const [ref, inView] = useInView()
+  const { theme } = useTheme()
+  const { backgroundColor, color } = useThemeStyles();
 
   useEffect(() => {
     if (inView) {
@@ -87,53 +90,78 @@ export default function KeyFeatures() {
   }, [controls, inView])
 
   return (
-    <section id="features" className="relative py-16 bg-[#E6E6FA] overflow-hidden">
-      {floatingIcons.map(({ Icon, size, ...position }, index) => (
-        <motion.div
-          key={index}
-          className="absolute text-gray-400/30"
-          style={position}
-          animate={{
-            y: index % 2 === 0 ? [0, -10, 0] : [0, 10, 0],
-            x: index % 3 === 0 ? [0, 10, 0] : [-10, 0, -10],
-            rotate: [0, index % 2 === 0 ? 10 : -10, 0],
-          }}
-          transition={{
-            duration: 5 + index,
-            repeat: Infinity,
-            repeatType: "reverse",
-          }}
-        >
-          <Icon size={size} />
-        </motion.div>
-      ))}
-      <div className="container relative z-10 mx-auto px-4">
-        <h2 className="text-4xl font-bold mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-          Key Features
-        </h2>
-        <motion.div
-          ref={ref}
-          animate={controls}
-          initial="hidden"
-          variants={{
-            visible: { opacity: 1, y: 0 },
-            hidden: { opacity: 0, y: 50 }
-          }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-          {features.map((feature, index) => (
-            <FeatureCard key={index} {...feature} index={index} />
-          ))}
-        </motion.div>
-      </div>
-    </section>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor }}>
+      <Card className="w-full max-w-7xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
+        <CardContent className="p-6">
+          <section id="features" className="relative py-16 overflow-hidden transition-colors duration-300" style={{ color }}>
+            {floatingIcons.map(({ Icon, size, ...position }, index) => (
+              <motion.div
+                key={index}
+                className={`absolute ${theme === 'dark' ? 'text-gray-700/20' : 'text-gray-400/30'}`}
+                style={position}
+                animate={{
+                  y: index % 2 === 0 ? [0, -10, 0] : [0, 10, 0],
+                  x: index % 3 === 0 ? [0, 10, 0] : [-10, 0, -10],
+                  rotate: [0, index % 2 === 0 ? 10 : -10, 0],
+                }}
+                transition={{
+                  duration: 5 + index,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                }}
+              >
+                <Icon size={size} />
+              </motion.div>
+            ))}
+            <div className="relative z-10">
+              <motion.h2 
+                className="text-4xl font-bold mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                Key Features
+              </motion.h2>
+              <motion.div
+                ref={ref}
+                animate={controls}
+                initial="hidden"
+                variants={{
+                  visible: { opacity: 1, y: 0 },
+                  hidden: { opacity: 0, y: 50 }
+                }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              >
+                {features.map((feature, index) => (
+                  <FeatureCard key={index} {...feature} index={index} />
+                ))}
+              </motion.div>
+            </div>
+          </section>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 
 function FeatureCard({ icon, title, description, details, index }: Feature & { index: number }) {
   const [isOpen, setIsOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const { theme } = useTheme()
+  const { backgroundColor, color } = useThemeStyles();
+
+  const getCardBackground = () => {
+    return theme === 'dark' 
+      ? 'bg-gray-800/70 backdrop-blur-sm'
+      : 'bg-white/70 backdrop-blur-sm';
+  }
+
+  const getHoverEffect = () => {
+    return theme === 'dark'
+      ? 'hover:bg-gray-700/80 hover:shadow-lg hover:shadow-primary/20'
+      : 'hover:bg-white/80 hover:shadow-lg hover:shadow-primary/20';
+  }
 
   return (
     <motion.div
@@ -148,13 +176,13 @@ function FeatureCard({ icon, title, description, details, index }: Feature & { i
       onHoverEnd={() => setIsHovered(false)}
       className="h-full"
     >
-      <Card className={`h-full transition-all duration-300 ${isHovered ? 'shadow-lg ring-2 ring-primary/50' : ''}`}>
+      <Card className={`h-full transition-all duration-300 ${getCardBackground()} ${getHoverEffect()} ${isHovered ? 'ring-2 ring-primary/50' : ''}`}>
         <CardHeader>
           <div className="flex items-center space-x-2">
             <motion.div
-              animate={isHovered ? { rotate: 360 } : { rotate: 0 }}
+              animate={isHovered ? { rotate: 360, scale: 1.1 } : { rotate: 0, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="p-2 bg-primary/10 rounded-full"
+              className={`p-2 rounded-full ${theme === 'dark' ? 'bg-gray-700' : 'bg-primary/10'}`}
             >
               {icon}
             </motion.div>
@@ -162,20 +190,20 @@ function FeatureCard({ icon, title, description, details, index }: Feature & { i
           </div>
         </CardHeader>
         <CardContent className="flex flex-col justify-between h-[calc(100%-5rem)]">
-          <CardDescription className="mb-4">{description}</CardDescription>
+          <CardDescription className="mb-4" style={{ color: theme === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }}>{description}</CardDescription>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" className="w-full mt-auto">
                 Learn More
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px]" style={{ backgroundColor: theme === 'dark' ? 'rgba(31, 41, 55, 0.95)' : 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)' }}>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   {icon}
                   <span>{title}</span>
                 </DialogTitle>
-                <DialogDescription className="mt-4 text-sm leading-6">{details}</DialogDescription>
+                <DialogDescription className="mt-4 text-sm leading-6" style={{ color: theme === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }}>{details}</DialogDescription>
               </DialogHeader>
               <div className="mt-6 flex justify-end">
                 <Button onClick={() => setIsOpen(false)}>Close</Button>

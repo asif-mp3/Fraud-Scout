@@ -40,7 +40,7 @@ const floatingIcons = [
   { Icon: CreditCard, size: 34, top: '70%', right: '30%', rotation: '8deg' },
 ]
 
-export default function Dashboard({ dashboardData }: DashboardProps) {
+export default function Component({ dashboardData }: DashboardProps) {
   const [activeTab, setActiveTab] = useState('upload')
   const [liveTransactions, setLiveTransactions] = useState<{ id: number; amount: number; status: 'Normal' | 'Suspicious' }[]>([])
   const [transactionHistory, setTransactionHistory] = useState<{ time: string; normal: number; suspicious: number }[]>([])
@@ -130,106 +130,110 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
           <Icon size={size} />
         </motion.div>
       ))}
-      <div className="container mx-auto px-10 py-8 relative z-10">
-        <h1 className="text-5xl font-bold mb-12 text-center">
-          FraudScout Dashboard
-        </h1>
+      <div className="container mx-auto p-4 sm:p-6 md:p-8 lg:p-10 relative z-10">
+        <Card className={`${theme === 'dark' ? 'bg-gray-800/80' : 'bg-white/80'} backdrop-blur-sm shadow-xl`}>
+          <CardContent className="p-4 sm:p-6 md:p-8 lg:p-10">
+            <h1 className="text-4xl sm:text-5xl font-bold mb-8 sm:mb-12 text-center">
+              FraudScout Dashboard
+            </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          <DashboardCard
-            title="Total Transactions"
-            value={dashboardData.totalTransactions.toLocaleString()}
-            icon={<BarChart className="h-6 w-6" />}
-            color="blue"
-          />
-          <DashboardCard
-            title="Fraudulent Transactions"
-            value={dashboardData.fraudulentTransactions.toString()}
-            icon={<AlertTriangle className="h-6 w-6" />}
-            description={`${((dashboardData.fraudulentTransactions / dashboardData.totalTransactions) * 100).toFixed(2)}% of total`}
-            color="red"
-          />
-          <DashboardCard
-            title="Alerts Triggered"
-            value={dashboardData.alertsTriggered.toString()}
-            icon={<Bell className="h-6 w-6" />}
-            color="yellow"
-          />
-          <DashboardCard
-            title="Risk Score"
-            value={`${dashboardData.riskScore}/100`}
-            icon={<TrendingUp className="h-6 w-6" />}
-            progress={dashboardData.riskScore}
-            color="green"
-          />
-        </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">
+              <DashboardCard
+                title="Total Transactions"
+                value={dashboardData.totalTransactions.toLocaleString()}
+                icon={<BarChart className="h-6 w-6" />}
+                color="blue"
+              />
+              <DashboardCard
+                title="Fraudulent Transactions"
+                value={dashboardData.fraudulentTransactions.toString()}
+                icon={<AlertTriangle className="h-6 w-6" />}
+                description={`${((dashboardData.fraudulentTransactions / dashboardData.totalTransactions) * 100).toFixed(2)}% of total`}
+                color="red"
+              />
+              <DashboardCard
+                title="Alerts Triggered"
+                value={dashboardData.alertsTriggered.toString()}
+                icon={<Bell className="h-6 w-6" />}
+                color="yellow"
+              />
+              <DashboardCard
+                title="Risk Score"
+                value={`${dashboardData.riskScore}/100`}
+                icon={<TrendingUp className="h-6 w-6" />}
+                progress={dashboardData.riskScore}
+                color="green"
+              />
+            </div>
 
-        <Card className={`mb-10 ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} shadow-xl`}>
-          <CardContent className="p-6">
-            <Tabs defaultValue="upload" onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-8 mt-2">
-                {['upload', 'realtime', 'reports'].map((tab) => (
-                  <TabsTrigger
-                    key={tab}
-                    value={tab}
-                    className={`text-lg transition-all duration-300 ease-in-out ${
-                      activeTab === tab
-                        ? 'bg-primary text-primary-foreground shadow-md'
-                        : 'hover:bg-muted'
-                    }`}
-                  >
-                    {tab === 'upload' && <Upload className="w-5 h-5 mr-2" />}
-                    {tab === 'realtime' && <Activity className="w-5 h-5 mr-2" />}
-                    {tab === 'reports' && <FileText className="w-5 h-5 mr-2" />}
-                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeTab}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <TabsContent value="upload" className="mt-0">
-                    <CSVUpload
-                      onSubmit={onSubmit}
-                      handleImage={handleImage}
-                      isLoading={isLoading}
-                      image={image}
-                      uploadProgress={uploadProgress}
-                      showData={showData}
-                      response={response}
-                    />
-                  </TabsContent>
-                  <TabsContent value="realtime" className="mt-0">
-                    <Monitor
-                      liveTransactions={liveTransactions}
-                      transactionHistory={transactionHistory}
-                    />
-                  </TabsContent>
-                  <TabsContent value="reports" className="mt-0">
-                    <Reports />
-                  </TabsContent>
-                </motion.div>
-              </AnimatePresence>
-            </Tabs>
+            <Card className={`mb-8 sm:mb-10 ${theme === 'dark' ? 'bg-gray-700/80' : 'bg-gray-100/80'} backdrop-blur-sm shadow-lg`}>
+              <CardContent className="p-4 sm:p-6">
+                <Tabs defaultValue="upload" onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="grid w-full grid-cols-3 mb-6 sm:mb-8">
+                    {['upload', 'realtime', 'reports'].map((tab) => (
+                      <TabsTrigger
+                        key={tab}
+                        value={tab}
+                        className={`text-base sm:text-lg transition-all duration-300 ease-in-out ${
+                          activeTab === tab
+                            ? 'bg-primary text-primary-foreground shadow-md'
+                            : 'hover:bg-muted'
+                        }`}
+                      >
+                        {tab === 'upload' && <Upload className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />}
+                        {tab === 'realtime' && <Activity className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />}
+                        {tab === 'reports' && <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />}
+                        {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeTab}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <TabsContent value="upload" className="mt-0">
+                        <CSVUpload
+                          onSubmit={onSubmit}
+                          handleImage={handleImage}
+                          isLoading={isLoading}
+                          image={image}
+                          uploadProgress={uploadProgress}
+                          showData={showData}
+                          response={response}
+                        />
+                      </TabsContent>
+                      <TabsContent value="realtime" className="mt-0">
+                        <Monitor
+                          liveTransactions={liveTransactions}
+                          transactionHistory={transactionHistory}
+                        />
+                      </TabsContent>
+                      <TabsContent value="reports" className="mt-0">
+                        <Reports />
+                      </TabsContent>
+                    </motion.div>
+                  </AnimatePresence>
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            <div className="text-center">
+              <Button 
+                variant="outline" 
+                onClick={() => window.print()}
+                className={`transition-all duration-300 ease-in-out hover:bg-blue-500 hover:text-white ${
+                  theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+                }`}
+              >
+                Export Dashboard
+              </Button>
+            </div>
           </CardContent>
         </Card>
-
-        <div className="text-center pb-8">
-          <Button 
-            variant="outline" 
-            onClick={() => window.print()}
-            className={`transition-all duration-300 ease-in-out hover:bg-blue-500 hover:text-white pr-4 ${
-              theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
-            }`}
-          >
-            Export Dashboard
-          </Button>
-        </div>
       </div>
     </motion.div>
   )
@@ -269,23 +273,24 @@ function DashboardCard({ title, value, icon, description, progress, color }: {
             whileTap={{ scale: 0.95 }}
           >
             <Card 
-              className={`${colors[color]} text-white overflow-hidden relative transition-all duration-300 border border-black h-48 ${isHovered ? neonColors[color] : ''}`}
+              className={`${colors[color]} text-white overflow-hidden relative transition-all duration-300 border border-black h-40 sm:h-48 ${isHovered ? neonColors[color] : ''}`}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-lg font-medium">{title}</CardTitle>
+                <CardTitle className="text-base sm:text-lg font-medium">{title}</CardTitle>
                 <motion.div
                   className="p-2 bg-white bg-opacity-20 rounded-full"
                   animate={{ rotate: isHovered ? 12 : 0 }}
                   transition={{ type: "spring", stiffness: 260, damping: 20 }}
                 >
                   {icon}
+                
                 </motion.div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold mb-2">{value}</div>
-                {description && <p className="text-sm opacity-80">{description}</p>}
+                <div className="text-2xl sm:text-3xl font-bold mb-2">{value}</div>
+                {description && <p className="text-xs sm:text-sm opacity-80">{description}</p>}
                 {progress !== undefined && (
                   <div className="mt-4">
                     <div className="h-2 bg-white bg-opacity-20 rounded-full overflow-hidden">
@@ -296,7 +301,7 @@ function DashboardCard({ title, value, icon, description, progress, color }: {
                         transition={{ duration: 1, ease: "easeOut" }}
                       />
                     </div>
-                    <div className="mt-1 text-sm opacity-80">{progress}% Risk</div>
+                    <div className="mt-1 text-xs sm:text-sm opacity-80">{progress}% Risk</div>
                   </div>
                 )}
               </CardContent>
@@ -304,7 +309,7 @@ function DashboardCard({ title, value, icon, description, progress, color }: {
           </motion.div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Click to view detailed  {title.toLowerCase()} report</p>
+          <p>Click to view detailed {title.toLowerCase()} report</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
