@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { 
   Shield, 
@@ -341,8 +343,23 @@ const questions: Record<string, Question[]> = {
 
 export default function FAQ() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
-  const [expandedQuestion, setExpandedQuestion] = useState<string | null>(null)
+  const [expandedQuestion, setExpandedQuestion] = useState<string |   null>(null)
   const [searchTerm, setSearchTerm] = useState("")
+  const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([])
+
+  useEffect(() => {
+    if (activeCategory) {
+      setFilteredQuestions(
+        questions[activeCategory].filter(
+          (q) =>
+            q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            q.answer.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      )
+    } else {
+      setFilteredQuestions([])
+    }
+  }, [activeCategory, searchTerm])
 
   const handleCategoryClick = (categoryId: string) => {
     if (activeCategory === categoryId) {
@@ -359,151 +376,150 @@ export default function FAQ() {
     setExpandedQuestion(expandedQuestion === questionId ? null : questionId)
   }
 
-  const filteredQuestions = activeCategory
-    ? questions[activeCategory].filter(
-        (q) =>
-          q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          q.answer.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : []
-
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center mb-12"
-      >
-        <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50">
-          Frequently Asked Questions
-        </h2>
-        <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Find answers to common questions about FraudScout's features and capabilities
-        </p>
-      </motion.div>
-
-      <div className="flex flex-wrap justify-center gap-2 mb-8">
-        {categories.map(({ id, label, icon: Icon }) => (
-          <Button
-            key={id}
-            variant={activeCategory === id ? "default" : "outline"}
-            onClick={() => handleCategoryClick(id)}
-            className={cn(
-              "gap-2 transition-all duration-300",
-              activeCategory === id ? "shadow-lg scale-105" : "hover:scale-105"
-            )}
-          >
-            <Icon className="w-4 h-4" />
-            <span>{label}</span>
-          </Button>
-        ))}
-      </div>
-
-      <AnimatePresence mode="wait">
-        {activeCategory && questions[activeCategory] && (
-          <motion.div
-            key={activeCategory}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="grid gap-4"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                {(() => {
-                  const category = categories.find(c => c.id === activeCategory)
-                  if (category) {
-                    const Icon = category.icon
-                    return <Icon className="w-6 h-6" />
-                  }
-                  return null
-                })()}
-                <h3 className="text-2xl font-semibold">
-                  {categories.find(c => c.id === activeCategory)?.label}
-                </h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Search questions..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleCategoryClick(activeCategory)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            {filteredQuestions.map((q) => (
-              <Card
-                key={q.id}
-                className={cn(
-                  "transition-all duration-300",
-                  expandedQuestion === q.id ? "shadow-lg" : "hover:shadow-md"
-                )}
-              >
-                <CardHeader
-                  className="cursor-pointer flex flex-row items-center justify-between space-y-0"
-                  onClick={() => handleQuestionClick(q.id)}
-                >
-                  <CardTitle className="text-xl font-medium flex items-center gap-2">
-                    {(() => {
-                      const Icon = q.icon
-                      return <Icon className="w-5 h-5" />
-                    })()}
-                    {q.question}
-                  </CardTitle>
-                  {expandedQuestion === q.id ? (
-                    <ChevronUp className="h-5 w-5 text-muted-foreground transition-transform duration-200" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform duration-200" />
-                  )}
-                </CardHeader>
-                <AnimatePresence>
-                  {expandedQuestion === q.id && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <CardContent className="pt-4">
-                        <Separator className="mb-4" />
-                        <p className="text-muted-foreground leading-relaxed">
-                          {q.answer}
-                        </p>
-                      </CardContent>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </Card>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {!activeCategory && (
+    <Card className="w-full max-w-7xl mx-auto shadow-xl">
+      <CardContent className="p-8">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
         >
-          <p className="text-xl text-muted-foreground">
-            Select a category to view related questions
+          <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Find answers to common questions about FraudScout's features and capabilities
           </p>
         </motion.div>
-      )}
-    </div>
+
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {categories.map(({ id, label, icon: Icon }) => (
+            <Button
+              key={id}
+              variant={activeCategory === id ? "default" : "outline"}
+              onClick={() => handleCategoryClick(id)}
+              className={cn(
+                "gap-2 transition-all duration-300",
+                activeCategory === id ? "shadow-lg scale-105" : "hover:scale-105"
+              )}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{label}</span>
+            </Button>
+          ))}
+        </div>
+
+        <AnimatePresence mode="wait">
+          {activeCategory && questions[activeCategory] && (
+            <motion.div
+              key={activeCategory}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  {(() => {
+                    const category = categories.find(c => c.id === activeCategory)
+                    if (category) {
+                      const Icon = category.icon
+                      return <Icon className="w-6 h-6" />
+                    }
+                    return null
+                  })()}
+                  <h3 className="text-2xl font-semibold">
+                    {categories.find(c => c.id === activeCategory)?.label}
+                  </h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Search questions..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 pr-4 py-2"
+                    />
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleCategoryClick(activeCategory)}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <ScrollArea className="h-[60vh] pr-4">
+                <div className="space-y-4">
+                  {filteredQuestions.map((q) => (
+                    <Card
+                      key={q.id}
+                      className={cn(
+                        "transition-all duration-300",
+                        expandedQuestion === q.id ? "shadow-lg" : "hover:shadow-md"
+                      )}
+                    >
+                      <CardHeader
+                        className="cursor-pointer flex flex-row items-center justify-between space-y-0"
+                        onClick={() => handleQuestionClick(q.id)}
+                      >
+                        <CardTitle className="text-xl font-medium flex items-center gap-2">
+                          {(() => {
+                            const Icon = q.icon
+                            return <Icon className="w-5 h-5" />
+                          })()}
+                          {q.question}
+                        </CardTitle>
+                        {expandedQuestion === q.id ? (
+                          <ChevronUp className="h-5 w-5 text-muted-foreground transition-transform duration-200" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform duration-200" />
+                        )}
+                      </CardHeader>
+                      <AnimatePresence>
+                        {expandedQuestion === q.id && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <CardContent className="pt-4">
+                              <Separator className="mb-4" />
+                              <p className="text-muted-foreground leading-relaxed">
+                                {q.answer}
+                              </p>
+                            </CardContent>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </Card>
+                  ))}
+                </div>
+              </ScrollArea>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {!activeCategory && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
+            <HelpCircle className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-xl text-muted-foreground">
+              Select a category to view related questions
+            </p>
+          </motion.div>
+        )}
+      </CardContent>
+    </Card>
   )
 }

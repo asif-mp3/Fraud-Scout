@@ -74,10 +74,10 @@ export default function FraudScoutDashboard() {
 
   // Simulated data for the dashboard
   const dashboardData = {
-    totalTransactions: 492,
+    totalTransactions: 493,
     fraudulentTransactions: 33,
-    alertsTriggered: 18,
-    riskScore: 72,
+    alertsTriggered: 12,
+    riskScore: 22,
   }
 
   return (
@@ -122,8 +122,10 @@ export default function FraudScoutDashboard() {
           
           <section id="faq" className="scroll-mt-16">
             <FAQ />
+            
           </section>
         </main>
+
         <Footer />
       </div>
     </ThemeProvider>

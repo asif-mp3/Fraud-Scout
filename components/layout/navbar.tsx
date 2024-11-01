@@ -1,8 +1,6 @@
 'use client'
 
 import * as React from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
 import { CreditCard, Menu, Moon, Sun, User, Bell, Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,11 +18,11 @@ import { Badge } from "@/components/ui/badge"
 import { motion, AnimatePresence } from "framer-motion"
 
 const navItems = [
-  { name: "Home", href: "/" },
-  { name: "Dashboard", href: "/dashboard" },
-  { name: "Reports", href: "/reports" },
-  { name: "Settings", href: "/settings" },
-  { name: "Contact", href: "/contact" },
+  { name: "Home", href: "#hero" },
+  { name: "Dashboard", href: "#dashboard" },
+  { name: "Features", href: "#features" },
+  { name: "FAQs", href: "#faq" },
+  { name: "Contact", href: "#footer" },
 ]
 
 export default function Navbar() {
@@ -33,7 +31,6 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
-  const pathname = usePathname()
 
   const handleScroll = React.useCallback(() => {
     setIsScrolled(window.scrollY > 0)
@@ -47,7 +44,6 @@ export default function Navbar() {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log("Search query:", searchQuery)
-    // Implement search functionality here
     setSearchOpen(false)
     setSearchQuery("")
   }
@@ -55,6 +51,14 @@ export default function Navbar() {
   const handleLogout = () => {
     // Implement logout logic here
     window.location.href = "/login"
+  }
+
+  const scrollToSection = (href: string) => {
+    const element = document.querySelector(href)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+    }
+    setIsMobileMenuOpen(false)
   }
 
   return (
@@ -78,22 +82,24 @@ export default function Navbar() {
             <SheetContent side="left" className="w-[300px] sm:w-[400px]">
               <nav className="flex flex-col gap-4">
                 {navItems.map((item) => (
-                  <Link
+                  <Button
                     key={item.name}
-                    href={item.href}
-                    className={`text-sm font-medium transition-colors hover:text-primary ${
-                      pathname === item.href ? "text-primary" : ""
-                    }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    variant="ghost"
+                    className="justify-start"
+                    onClick={() => scrollToSection(item.href)}
                   >
                     {item.name}
-                  </Link>
+                  </Button>
                 ))}
               </nav>
             </SheetContent>
           </Sheet>
 
-          <Link href="/" className="flex items-center space-x-2">
+          <Button
+            variant="ghost"
+            onClick={() => scrollToSection('#home')}
+            className="flex items-center space-x-2"
+          >
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.5 }}
@@ -103,24 +109,21 @@ export default function Navbar() {
             <span className="hidden font-bold sm:inline-block">
               FraudScout
             </span>
-          </Link>
+          </Button>
         </div>
 
         {/* Center - Desktop Links */}
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
           {navItems.map((item) => (
-            <Link
+            <Button
               key={item.name}
-              href={item.href}
-              className={`relative transition-colors hover:text-primary group ${
-                pathname === item.href ? "text-primary" : ""
-              }`}
+              variant="ghost"
+              className="relative transition-colors hover:text-primary group"
+              onClick={() => scrollToSection(item.href)}
             >
               {item.name}
-              <span className={`absolute inset-x-0 bottom-0 h-0.5 bg-primary transition-transform ${
-                pathname === item.href ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-              }`} />
-            </Link>
+              <span className="absolute inset-x-0 bottom-0 h-0.5 bg-primary transition-transform scale-x-0 group-hover:scale-x-100" />
+            </Button>
           ))}
         </nav>
 
@@ -168,7 +171,7 @@ export default function Navbar() {
             )}
           </AnimatePresence>
 
-          <Button>Get Started</Button>
+          <Button onClick={() => scrollToSection('#home')}>Get Started</Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -187,9 +190,9 @@ export default function Navbar() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Notifications</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>New message</DropdownMenuItem>
-              <DropdownMenuItem>Account update</DropdownMenuItem>
-              <DropdownMenuItem>Security alert</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection('#home')}>New message</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection('#dashboard')}>Account update</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection('#features')}>Security alert</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -206,15 +209,10 @@ export default function Navbar() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/profile">Profile</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/settings">Settings</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/support">Support</Link>
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection('#home')}>Profile</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection('#dashboard')}>Settings</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection('#faqs')}>FAQs</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection('#contact')}>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
             </DropdownMenuContent>

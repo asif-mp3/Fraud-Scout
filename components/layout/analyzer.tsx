@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Slider } from "@/components/ui/slider"
 import { ArrowUpDown, Download, Loader2, Search, AlertTriangle, BarChart2, FileText, PieChart, TrendingUp, DollarSign, Clock, AlertCircle } from "lucide-react"
 import { saveAs } from 'file-saver'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip as ChartTooltip, Legend, ArcElement, PointElement, LineElement } from 'chart.js'
@@ -32,7 +32,6 @@ interface AnalyzerProps {
 export default function Analyzer({ parsedData }: AnalyzerProps) {
   const [entriesPerPage, setEntriesPerPage] = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
-  const [sensitivity, setSensitivity] = useState(50)
   const [modifiedResult, setModifiedResult] = useState<Transaction[]>([])
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [sortField, setSortField] = useState<'Amount' | 'Time' | 'Prediction'>('Amount')
@@ -41,12 +40,7 @@ export default function Analyzer({ parsedData }: AnalyzerProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('overview')
-
-  const calculateRiskScore = useCallback((entry: Transaction) => {
-    const amountWeight = 0.7
-    const timeWeight = 0.3
-    return (amountWeight * entry.Amount - timeWeight * entry.Time) / 100
-  }, [])
+  const [sensitivity, setSensitivity] = useState(15)
 
   const modifyResultWithSensitivity = useCallback(() => {
     if (!parsedData || !Array.isArray(parsedData.data)) return
@@ -177,14 +171,14 @@ export default function Analyzer({ parsedData }: AnalyzerProps) {
   }
 
   const pieChartData = useMemo(() => {
-    const fraudAmount = filteredAndSortedResult.filter(entry => entry.Prediction === 1).reduce((sum, entry) => sum + entry.Amount, 0)
-    const genuineAmount = filteredAndSortedResult.filter(entry => entry.Prediction === 0).reduce((sum, entry) => sum + entry.Amount, 0)
+    const fraudCount = filteredAndSortedResult.filter(entry => entry.Prediction === 1).length
+    const genuineCount = filteredAndSortedResult.filter(entry => entry.Prediction === 0).length
 
     return {
       labels: ['Fraud', 'Genuine'],
       datasets: [
         {
-          data: [fraudAmount, genuineAmount],
+          data: [fraudCount, genuineCount],
           backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(75, 192, 192, 0.6)'],
           borderColor: ['rgb(255, 99, 132)', 'rgb(75, 192, 192)'],
           borderWidth: 1,
@@ -279,13 +273,33 @@ export default function Analyzer({ parsedData }: AnalyzerProps) {
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="charts">Charts</TabsTrigger>
             <TabsTrigger value="table">Table</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Fraud Detection Sensitivity</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <label className="text-sm font-medium">
+                  Fraud Detection Sensitivity: {sensitivity}%
+                </label>
+                <Slider
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={[sensitivity]}
+                  onValueChange={handleSensitivityChange}
+                  aria-label="Sensitivity"
+                />
+                <p className="text-sm text-muted-foreground">
+                  Adjust the sensitivity to fine-tune fraud detection. Higher values may increase false positives.
+                </p>
+              </CardContent>
+            </Card>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -325,8 +339,8 @@ export default function Analyzer({ parsedData }: AnalyzerProps) {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Fraud  Percentage</CardTitle>
-                  <PieChart className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium">Fraud Percentage</CardTitle>
+                  <PieChart className="h-4 w-4 text-muted-foreground"   />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{fraudPercentage.toFixed(2)}%</div>
@@ -451,7 +465,6 @@ export default function Analyzer({ parsedData }: AnalyzerProps) {
                             <ArrowUpDown className={`ml-2 h-4 w-4 inline ${sortOrder === 'desc' ? 'rotate-180' : ''}`} />
                           )}
                         </TableHead>
-                        <TableHead>Risk Score</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -463,18 +476,6 @@ export default function Analyzer({ parsedData }: AnalyzerProps) {
                             <Badge variant={row.Prediction === 1 ? "destructive" : "success"}>
                               {row.Prediction === 1 ? 'Fraud' : 'Genuine'}
                             </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Progress value={calculateRiskScore(row)} max={1} className="w-[60px]" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Risk Score: {calculateRiskScore(row).toFixed(2)}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -514,31 +515,6 @@ export default function Analyzer({ parsedData }: AnalyzerProps) {
                 </CardContent>
               </Card>
             )}
-          </TabsContent>
-          <TabsContent value="settings" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Sensitivity Settings</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-medium">
-                    Fraud Detection Sensitivity: {sensitivity}%
-                  </label>
-                  <Slider
-                    min={0}
-                    max={100}
-                    step={1}
-                    value={[sensitivity]}
-                    onValueChange={handleSensitivityChange}
-                    aria-label="Sensitivity"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Adjust the sensitivity to fine-tune fraud detection. Higher values may increase false positives.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
         <div className="mt-4 flex justify-end">

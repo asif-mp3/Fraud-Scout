@@ -131,11 +131,15 @@ export default function Component({ dashboardData }: DashboardProps) {
         </motion.div>
       ))}
       <div className="container mx-auto p-4 sm:p-6 md:p-8 lg:p-10 relative z-10">
-        <Card className={`${theme === 'dark' ? 'bg-gray-800/80' : 'bg-white/80'} backdrop-blur-sm shadow-xl`}>
-          <CardContent className="p-4 sm:p-6 md:p-8 lg:p-10">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-8 sm:mb-12 text-center">
-              FraudScout Dashboard
-            </h1>
+
+      <h1 className="text-2xl text-center sm:text-3xl font-bold mb-6 sm:mb-10 text-center relative text-gray-800 dark:text-white font-['Press_Start_2P'] inline-block mx-auto">
+  Dashboard
+  <span className="absolute bottom-[-3px] left-0 h-[2px] w-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-md"></span>
+</h1>
+
+
+
+
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">
               <DashboardCard
@@ -165,7 +169,7 @@ export default function Component({ dashboardData }: DashboardProps) {
                 color="green"
               />
             </div>
-
+      
             <Card className={`mb-8 sm:mb-10 ${theme === 'dark' ? 'bg-gray-700/80' : 'bg-gray-100/80'} backdrop-blur-sm shadow-lg`}>
               <CardContent className="p-4 sm:p-6">
                 <Tabs defaultValue="upload" onValueChange={setActiveTab} className="w-full">
@@ -232,8 +236,8 @@ export default function Component({ dashboardData }: DashboardProps) {
                 Export Dashboard
               </Button>
             </div>
-          </CardContent>
-        </Card>
+        
+      
       </div>
     </motion.div>
   )
