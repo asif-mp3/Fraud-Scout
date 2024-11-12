@@ -91,7 +91,7 @@ export default function Component() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor }}>
-      <Card className="w-full max-w-fit bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
+       <Card className="w-full max-w bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
         <CardContent className="p-6">
           <section id="features" className="relative py-16 overflow-hidden transition-colors duration-300" style={{ color }}>
             {floatingIcons.map(({ Icon, size, ...position }, index) => (
@@ -149,7 +149,7 @@ function FeatureCard({ icon, title, description, details, index }: Feature & { i
   const [isOpen, setIsOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const { theme } = useTheme()
-  const { backgroundColor, color } = useThemeStyles();
+
 
   const getCardBackground = () => {
     return theme === 'dark' 

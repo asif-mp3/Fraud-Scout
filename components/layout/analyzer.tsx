@@ -10,9 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Slider } from "@/components/ui/slider"
-import { ArrowUpDown, Download, Loader2, Search, AlertTriangle, BarChart2, FileText, PieChart, TrendingUp, DollarSign, Clock, AlertCircle } from "lucide-react"
+import { ArrowUpDown, Loader2, Search, AlertTriangle, BarChart2, FileText, PieChart, DollarSign, AlertCircle } from "lucide-react"
 import { saveAs } from 'file-saver'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip as ChartTooltip, Legend, ArcElement, PointElement, LineElement } from 'chart.js'
 import { Bar, Pie, Line } from 'react-chartjs-2'
@@ -249,7 +248,7 @@ export default function Analyzer({ parsedData }: AnalyzerProps) {
 
   const totalAmount = useMemo(() => filteredAndSortedResult.reduce((sum, entry) => sum + entry.Amount, 0), [filteredAndSortedResult])
   const fraudAmount = useMemo(() => filteredAndSortedResult.filter(entry => entry.Prediction === 1).reduce((sum, entry) => sum + entry.Amount, 0), [filteredAndSortedResult])
-  const fraudPercentage = useMemo(() => (fraudAmount / totalAmount) * 100, [fraudAmount, totalAmount])
+  const fraudPercentage = useMemo(() => (fraudAmount / totalAmount) * 100 || 0, [fraudAmount, totalAmount])
 
   if (!parsedData || !Array.isArray(parsedData.data) || parsedData.data.length === 0) {
     return (
@@ -338,9 +337,10 @@ export default function Analyzer({ parsedData }: AnalyzerProps) {
                 </CardContent>
               </Card>
               <Card>
+                
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Fraud Percentage</CardTitle>
-                  <PieChart className="h-4 w-4 text-muted-foreground"   />
+                  <PieChart className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{fraudPercentage.toFixed(2)}%</div>
@@ -423,6 +423,7 @@ export default function Analyzer({ parsedData }: AnalyzerProps) {
                       <SelectItem value="25">25 per page</SelectItem>
                       <SelectItem value="50">50 per page</SelectItem>
                       <SelectItem value="100">100 per page</SelectItem>
+                      
                     </SelectContent>
                   </Select>
                 </div>
@@ -436,6 +437,7 @@ export default function Analyzer({ parsedData }: AnalyzerProps) {
               </Alert>
             )}
             {loading ? (
+              
               <Card>
                 <CardContent className="flex justify-center items-center h-64">
                   <Loader2 className="h-8 w-8 animate-spin" />

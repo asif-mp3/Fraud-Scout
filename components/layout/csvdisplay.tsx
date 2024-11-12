@@ -1,10 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Upload, AlertCircle } from "lucide-react"
+//import React, { useState } from 'react'
+//import { Button } from "@/components/ui/button"
+//import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+//import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+//import { Upload, AlertCircle } from "lucide-react"
 
 // Importing the CSVUpload and Analyzer components
 import CSVUpload from '../components/dashboard/csvupload'
@@ -17,8 +17,9 @@ export default function Component() {
   const handleDataParsed = (data) => {
     setParsedData(data)
     setError(null)
+    parsedData(data)
   }
-
+  
   const handleError = (err) => {
     setError(err.message || 'An error occurred while uploading the file.')
     setParsedData(null)

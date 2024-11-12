@@ -1,17 +1,20 @@
 'use client'
-import 'typeface-press-start-2p'; 
-import '../../app/globals.css';
+
+import 'typeface-press-start-2p'
+import '../../app/globals.css'
 import React, { useState, useRef, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import { ChevronDown, ArrowRight, Shield, CreditCard, Lock, AlertTriangle, Eye, FileSearch, BarChart2, Fingerprint, Wifi, Settings, ShieldOff, Database, Globe, UserCheck, Key } from 'lucide-react'
 import { useTypewriter } from 'react-simple-typewriter'
+import { useRouter } from 'next/navigation'
 
-export default function Component() {
+export default function Hero() {
   const [currentTextIndex, setCurrentTextIndex] = useState(0)
   const contentRef = useRef<HTMLDivElement>(null)
   const controls = useAnimation()
   const [isHovered, setIsHovered] = useState(false)
+  const router = useRouter()
 
   const [text] = useTypewriter({
     words: ['Welcome to FraudScout'],
@@ -34,7 +37,7 @@ export default function Component() {
       setCurrentTextIndex((prevIndex) => (prevIndex + 1) % heroTexts.length)
     }, 4000)
     return () => clearInterval(textRotation)
-  }, [])
+  },)
 
   useEffect(() => {
     controls.start({
@@ -48,6 +51,10 @@ export default function Component() {
     if (nextSection) {
       nextSection.scrollIntoView({ behavior: 'smooth' })
     }
+  }
+
+  const handleGetStarted = () => {
+    router.push('/login')
   }
 
   const floatingIcons = [
@@ -71,7 +78,7 @@ export default function Component() {
 
   return (
     <section
-      className="relative w-full min-h-screen overflow-hidden flex flex-col justify-center items-center "
+      className="relative w-full min-h-screen overflow-hidden flex flex-col justify-center items-center"
       aria-label="Hero section with welcome message and key features"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 opacity-50"></div>
@@ -112,9 +119,6 @@ export default function Component() {
                   boxShadow: `0 0 15px 2px #39FF14, 0 0 30px 4px #09610d, 0 0 45px 6px #66FF66`,
                   filter: 'blur(4px)',
                 }}
-                
-                
-                
               ></motion.div>
               
               {/* Card content */}
@@ -127,7 +131,7 @@ export default function Component() {
                   <div className="flex justify-between">
                     <div>
                       <div className="text-xs opacity-75">Card Holder</div>
-                      <div>MOHAMED ASIF</div>
+                      <div>Mohamed Asif M</div>
                     </div>
                     <div>
                       <div className="text-xs opacity-75">Expires</div>
@@ -156,15 +160,14 @@ export default function Component() {
             <Shield className="inline-block text-primary h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20" />
           </motion.div>
           <motion.h1 
-  className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 tracking-tight text-black"
-  style={{ fontFamily: 'Press Start 2P, cursive' }} // Apply pixelated font
-  initial={{ y: -50 }}
-  animate={{ y: 0 }}
-  transition={{ type: "spring", stiffness: 100 }}
->
-  {text}
-</motion.h1>
-
+            className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 tracking-tight text-black"
+            style={{ fontFamily: 'Press Start 2P, cursive' }}
+            initial={{ y: -50 }}
+            animate={{ y: 0 }}
+            transition={{ type: "spring", stiffness: 100 }}
+          >
+            {text}
+          </motion.h1>
 
           <AnimatePresence mode="wait">
             <motion.p
@@ -182,6 +185,7 @@ export default function Component() {
             <Button 
               size="lg"
               className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 transform hover:scale-105 px-6 py-2 text-sm"
+              onClick={handleGetStarted}
             >
               Get Started
               <ArrowRight className="ml-2 h-4 w-4" />

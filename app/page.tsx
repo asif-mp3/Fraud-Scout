@@ -1,17 +1,31 @@
 'use client'
 
-import { useState, useEffect } from "react"
-import { useRouter } from 'next/navigation'
-import { Shield, Upload, BarChart, Search, Bell, Settings } from "lucide-react"
+import { useState, useEffect, Suspense, lazy } from "react"
+import { debounce } from 'lodash'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ThemeProvider } from '@/components/layout/ThemeContext'
+import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
+import { ChevronUp } from 'lucide-react'
 import Navbar from "@/components/layout/navbar"
 import Footer from '@/components/layout/footer'
 import Hero from '@/components/layout/hero'
-import Dashboard from '@/components/layout/dashboard'
-import KeyFeatures from '@/components/layout/keyfeat'
-import FAQ from '@/components/layout/faq'
-import { Progress } from "@/components/ui/progress"
+import How from '@/components/layout/how'
+import { ErrorBoundary } from 'react-error-boundary'
+
+const Dashboard = lazy(() => import("@/components/layout/dashboard"))
+const KeyFeatures = lazy(() => import("@/components/layout/keyfeat"))
+const FAQ = lazy(() => import("@/components/layout/faq"))
+
+function ErrorFallback({error, resetErrorBoundary}) {
+  return (
+    <div role="alert" className="p-4 bg-red-100 border border-red-400 rounded">
+      <p className="text-red-700">Something went wrong:</p>
+      <pre className="text-sm text-red-500">{error.message}</pre>
+      <Button onClick={resetErrorBoundary}>Try again</Button>
+    </div>
+  )
+}
 
 export default function FraudScoutDashboard() {
   const [image, setImage] = useState<File | null>(null)
@@ -20,20 +34,26 @@ export default function FraudScoutDashboard() {
   const [showData, setShowData] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [showBackToTop, setShowBackToTop] = useState(false)
 
-  const router = useRouter()
-
-  // Smooth scrolling effect
   useEffect(() => {
     const handleScroll = () => {
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight
-      const scrollPosition = window.scrollY
-      const progress = (scrollPosition / totalHeight) * 100
-      setScrollProgress(progress)
+      requestAnimationFrame(() => {
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight
+        const scrollPosition = window.scrollY
+        const progress = (scrollPosition / totalHeight) * 100
+        setScrollProgress(progress)
+        setShowBackToTop(scrollPosition > 300)
+      })
     }
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    const debouncedHandleScroll = debounce(handleScroll, 10)
+
+    window.addEventListener('scroll', debouncedHandleScroll)
+    return () => {
+      window.removeEventListener('scroll', debouncedHandleScroll)
+      debouncedHandleScroll.cancel()
+    }
   }, [])
 
   function handleImage(e: React.ChangeEvent<HTMLInputElement>) {
@@ -72,7 +92,6 @@ export default function FraudScoutDashboard() {
     }
   }
 
-  // Simulated data for the dashboard
   const dashboardData = {
     totalTransactions: 493,
     fraudulentTransactions: 33,
@@ -80,55 +99,92 @@ export default function FraudScoutDashboard() {
     riskScore: 22,
   }
 
+  function scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }
+
   return (
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+    <ThemeProvider storageKey="vite-ui-theme">
       <div className="flex flex-col min-h-screen">
-        <main className="flex-grow">
-          <Navbar />
-          <section id="hero" className="scroll-mt-16">
-          <Progress 
+        <Navbar />
+        <Progress 
           value={scrollProgress} 
-          className="fixed top-0 left-0 right-0 z-50 h-1 w-full bg-secondary"
-          indicatorClassName="bg-primary"
+          className="fixed top-0 left-0 right-0 z-50 h-1 w-full bg-secondary transition-all duration-300 ease-out"
+          indicatorClassName="bg-primary transition-all duration-300 ease-out"
         />
-            <Hero />
-          </section>
-          <div className="w-full flex justify-center my-8">
-            <div className="w-16 h-1 bg-primary rounded-full"></div>
-          </div>
-          
-          <section id="dashboard" className="scroll-mt-16">
-            <Dashboard 
-              dashboardData={dashboardData} 
-              onSubmit={onSubmit} 
-              handleImage={handleImage} 
-              isLoading={isLoading} 
-              image={image} 
-              uploadProgress={uploadProgress} 
-              showData={showData} 
-              response={response} 
-            />
-          </section>
-          <div className="w-full flex justify-center my-8">
-            <div className="w-16 h-1 bg-primary rounded-full"></div>
-          </div>
-          
-          <section id="features" className="scroll-mt-16">
-            <KeyFeatures />
-          </section>
-          <div className="w-full flex justify-center my-8">
-            <div className="w-16 h-1 bg-primary rounded-full"></div>
-          </div>
-          
-          <section id="faq" className="scroll-mt-16">
-            <FAQ />
+        <main className="flex-grow">
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <section id="hero" className="scroll-mt-16">
+              <Hero />
+            </section>
+            <Divider />
+
+            <How />
+            <Divider />
             
-          </section>
+            <Suspense fallback={<LoadingSpinner />}>
+              <section id="dashboard" className="scroll-mt-16">
+                <Dashboard 
+                  dashboardData={dashboardData} 
+                  onSubmit={onSubmit} 
+                  handleImage={handleImage} 
+                  isLoading={isLoading} 
+                  image={image} 
+                  uploadProgress={uploadProgress} 
+                  showData={showData} 
+                  response={response} 
+                />
+              </section>
+            </Suspense>
+            <Divider />
+            
+            <Suspense fallback={<LoadingSpinner />}>
+              <section id="features" className="scroll-mt-16">
+                <KeyFeatures />
+              </section>
+            </Suspense>
+            <Divider />
+            
+            <Suspense fallback={<LoadingSpinner />}>
+              <section id="faq" className="scroll-mt-16">
+                <FAQ />
+              </section>
+            </Suspense>
+          </ErrorBoundary>
         </main>
 
         <Footer />
+
+        {showBackToTop && (
+          <Button
+            className="fixed bottom-4 right-4 rounded-full p-2"
+            onClick={scrollToTop}
+            aria-label="Back to top"
+          >
+            <ChevronUp className="h-6 w-6" />
+          </Button>
+        )}
       </div>
     </ThemeProvider>
+  )
+}
+
+function Divider() {
+  return (
+    <div className="w-full flex justify-center my-8">
+      <div className="w-16 h-1 bg-primary rounded-full"></div>
+    </div>
+  )
+}
+
+function LoadingSpinner() {
+  return (
+    <div className="flex justify-center items-center h-32">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+    </div>
   )
 }
 

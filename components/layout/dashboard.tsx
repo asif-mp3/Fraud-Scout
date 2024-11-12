@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BarChart, Bell, TrendingUp, AlertTriangle, Upload, Activity, FileText, CreditCard, Lock, Shield, Eye, FileSearch, BarChart2, Fingerprint, Wifi, Settings, ShieldOff, Database, Globe, UserCheck, Key } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -132,7 +132,7 @@ export default function Component({ dashboardData }: DashboardProps) {
       ))}
       <div className="container mx-auto p-4 sm:p-6 md:p-8 lg:p-10 relative z-10">
 
-      <h1 className="text-2xl text-center sm:text-3xl font-bold mb-6 sm:mb-10 text-center relative text-gray-800 dark:text-white font-['Press_Start_2P'] inline-block mx-auto">
+      <h1 className="text-2xl text-center sm:text-3xl font-bold mb-6 sm:mb-10 relative text-gray-800 dark:text-white font-['Press_Start_2P'] inline-block mx-auto">
   Dashboard
   <span className="absolute bottom-[-3px] left-0 h-[2px] w-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-md"></span>
 </h1>
